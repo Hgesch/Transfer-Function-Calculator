@@ -1,0 +1,59 @@
+import numpy as np
+import pandas as pd
+from matlab import ss
+import matplotlib.pyplot as plt
+from scipy import signal
+
+while True:
+    print("Welcome to the Transfer Function Calculator!")
+    zero1 = int(input("What is the first zero value of the Transfer Function? "))
+    zero2 = int(input("What is the second zero value of the Transfer Function? "))
+    pole1 = int(input("What is the first pole for calculating the Transfer Function? "))
+    pole2 = int(input("What is the second pole value of the Transfer Function? "))
+    pole3 = int(input("What is the third pole value of the Transfer Function? "))
+    while True:
+        start = int(input("What is the starting frequency for the s-domain? "))
+        if start < 1:
+            print("Please input a starting freq value higher than 0!")
+        else:
+            break
+    while True:
+        stop = int(input("What is the stopping frequency for the s-domain? "))
+        if stop > 1000000000:
+            print("Please input a stopping freq value lower than 1E9!")
+        else:
+            break
+        time = np.geomspace(start, stop)
+        zero_mid = zero1 + zero2
+        zero_end = zero1 * zero2
+        pole_mid = pole1 + pole2
+        pole_end = pole1 * pole2
+        z1 = np.poly1d([1, zero_mid, zero_end])
+        p1 = np.poly1d([1, pole_mid, pole_end])
+        sys = signal.TransferFunction(z1, p1)
+        # sys = ss("zero1, zero2 "; "pole1, pole2, pole3")
+        mag_num = np.sqrt((time ** 2) + (zero1 ** 2)) + \  np.sqrt((time ** 2) + (zero2 ** 2))
+        mag_den = np.sqrt((time ** 2) + (pole1 ** 2)) + \ np.sqrt((time ** 2) + (pole2 **2))
+        mag = mag_num / mag_den
+        mag_db = 20 * np.log10(mag)
+        phase_num = np.degrees(np.arctan(time / zero1) +  np.arctan(time / zero2))
+        phase_den = np.degrees(np.arctan(time / pole1) + np.arctan(time / pole2))
+        phase = phase_num - phase_den
+        table = pd.DataFrame({"Magnitude: dB": mag_db,"Phase: Degrees": phase}, index=time)
+            print(table)
+         # Part 2: - Bode plots -
+        s1 = signal.lti(mag_num, mag_den)
+        w, mag, phase = signal.bode(s1)
+        plt.figure('Phase:')
+        plt.semilogx(w, mag)  # Bode magnitude plot
+        plt.figure('Magnitude:')
+        plt.semilogx(w, phase)  # Bode phase plot
+        plt.show(block=False)
+while True:
+again = string(input("Would you like to run again? [(Y)es or (N)o]: ").lower())
+if again in ("n", "no"):
+    quit()
+elif again in ("y", "yes"):
+        break
+    break
+
