@@ -54,6 +54,6 @@ again = string(input("Would you like to run again? [(Y)es or (N)o]: ").lower())
 if again in ("n", "no"):
     quit()
 elif again in ("y", "yes"):
-        break
     break
+break
 
